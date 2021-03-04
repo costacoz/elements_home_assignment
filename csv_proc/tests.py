@@ -31,3 +31,15 @@ class ProcessCSVTests(TestCase):
             return self.assertTrue(True)
         except ValueError:
             return self.fail(msg="Response is not JSON")
+
+
+class ImageHelperTests(TestCase):
+
+    def test_process_image(self):
+        pass
+
+    def test_make_img_mobile_friendly(self):
+        pass
+
+    def test_img_to_base64(self):
+        pass
