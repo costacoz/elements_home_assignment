@@ -2,10 +2,13 @@
 Helper classes.
 """
 import base64
+import csv
 import io
+import logging
+from multiprocessing import Pool
 
 import requests
-from PIL import Image, UnidentifiedImageError
+from PIL import Image
 
 from elements_assignment.settings import IMG_MOB_MAX_HEIGHT, IMG_MOB_MAX_WIDTH
 
@@ -16,15 +19,30 @@ class CSVHelper:
     """
 
     @staticmethod
-    def fetch_csv_data(csv_url):
+    def get_csv_data(csv_url):
+        """
+        Retrieves CSV data using URL and returns CSV file's data list.
+        """
+        try:
+            csv_data = CSVHelper.fetch_csv(csv_url)
+        except CSVException as e:
+            logging.exception(e)
+            raise CSVException('Unable to fetch CSV file')
+
+        csv_reader = csv.reader(csv_data, delimiter=',')
+
+        return list(csv_reader)
+
+    @staticmethod
+    def fetch_csv(url):
         """
         Fetch CSV file from csv_url url.
         :str:
         """
         try:
-            csv_response = requests.get(csv_url)
+            csv_response = requests.get(url)
         except requests.exceptions.RequestException as e:
-            print(e)
+            logging.exception(e)
             raise CSVException('Incorrect CSV file URL')
 
         return csv_response.text.split('\r\n')
@@ -57,6 +75,18 @@ class ImageHelper:
     """
 
     @staticmethod
+    def convert_images(image_urls):
+        """
+        Takes set of images, converts them and returns dictionary with image_url: base64.
+
+        Input: set of images
+        Output: dict with image_url: base64
+        """
+        with Pool() as p:
+            images_b64 = p.map(ImageHelper.convert_image, image_urls)
+        return dict(zip(image_urls, images_b64))
+
+    @staticmethod
     def convert_image(url):
         """
         Retrieves an image, makes sure it is mobile friendly and returns base64 string of the image.
@@ -71,7 +101,7 @@ class ImageHelper:
         try:
             img = Image.open(img_file)
         except Exception as e:
-            print(e)
+            logging.exception(e)
             return None
 
         img_mobile = ImageHelper.make_img_mobile_friendly(img)
@@ -90,7 +120,7 @@ class ImageHelper:
         try:
             img_response = requests.get(url)
         except requests.exceptions.RequestException as e:
-            print(e)
+            logging.exception(e)
             return None
 
         return io.BytesIO(img_response.content)
@@ -125,7 +155,7 @@ class ImageHelper:
         try:
             img.save(buffer, format=img.format)
         except ValueError as e:
-            print(e)
+            logging.exception(e)
             return None
 
         return base64.b64encode(buffer.getvalue()).decode('ascii')

@@ -80,13 +80,12 @@ class ImageHelperTests(TestCase):
 class CSVHelperTests(TestCase):
 
     def test_fetch_csv_data(self):
-        csv_data = CSVHelper.fetch_csv_data(CSV_URL)
+        csv_data = CSVHelper.get_csv_data(CSV_URL)
         return self.assertIsNotNone(csv_data)
 
     def test_get_header_fields_pos(self):
-        csv_data = CSVHelper.fetch_csv_data(CSV_URL)
-        csv_reader = csv.reader(csv_data, delimiter=',')
-        header = next(csv_reader)
+        csv_data = CSVHelper.get_csv_data(CSV_URL)
+        header = csv_data[0]
         description, = CSVHelper.get_header_fields_pos(header, 'description')
         print(description)
         self.assertTrue(description == 1)

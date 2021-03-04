@@ -20,7 +20,7 @@ There is an `processed_images` dict variable that contains image urls as a key a
 Image and CSV files computations are carried out to `helper.py` helper classes for structuring and readability puproses.
 
 ## Performance
-
+In order to improve the performance, `multiprocessing` module is being utilized. Using `Pool` the execution went from average of 23s down to 14s for an uncached request.  
 
 ## Working in DTAP
 There are 4 branches in this repository:
@@ -44,3 +44,9 @@ Response cache is implemented using `@cache_page` decorator for the view functio
 
 ## Scalability
 
+To achieve scalability we can use nginx with Load Balancer. 
+This application can be installed onto many servers and Load Balancer will be able to send requests to them.
+
+If one of the servers fail, the others will substitute it.
+
+Also in nginx Load Balancer `least_conn` directive can be applied to utilize a server with the least number of active connections.  
