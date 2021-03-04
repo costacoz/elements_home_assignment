@@ -10,13 +10,54 @@ from PIL import Image, UnidentifiedImageError
 from elements_assignment.settings import IMG_MOB_MAX_HEIGHT, IMG_MOB_MAX_WIDTH
 
 
+class CSVHelper:
+    """
+    Helper class that contains CSV file processing methods.
+    """
+
+    @staticmethod
+    def fetch_csv_data(csv_url):
+        """
+        Fetch CSV file from csv_url url.
+        :str:
+        """
+        try:
+            csv_response = requests.get(csv_url)
+        except requests.exceptions.RequestException as e:
+            print(e)
+            raise CSVException('Incorrect CSV file URL')
+
+        return csv_response.text.split('\r\n')
+
+    @staticmethod
+    def get_header_fields_pos(header, *fields):
+        """
+        Returns the position for each field in fields according to the header of CSV file.
+
+        :int: position of field in the header.
+        """
+        positions = []
+        for f in fields:
+            positions.append(list(map(str.lower, header)).index(f))
+        return positions
+
+
+class CSVException(Exception):
+    """
+    Custom exception class for CSVHelper
+    """
+
+    def __init__(self, msg):
+        super(self).__init__(msg)
+
+
 class ImageHelper:
     """
     Helper class that contains image processing methods.
     """
 
     @staticmethod
-    def process_image(url):
+    def convert_image(url):
         """
         Retrieves an image, makes sure it is mobile friendly and returns base64 string of the image.
         If URL is not an image, returns None.
@@ -24,23 +65,35 @@ class ImageHelper:
         Input: image url string
         Output: image base64 string
         """
+
+        img_file = ImageHelper.fetch_image_from_url(url)
+
+        try:
+            img = Image.open(img_file)
+        except Exception as e:
+            print(e)
+            return None
+
+        img_mobile = ImageHelper.make_img_mobile_friendly(img)
+        img_base64 = ImageHelper.img_to_base64(img_mobile)
+
+        return img_base64
+
+    @staticmethod
+    def fetch_image_from_url(url):
+        """
+        Fetches image from url.
+
+        Input: url string.
+        Output: image file.
+        """
         try:
             img_response = requests.get(url)
         except requests.exceptions.RequestException as e:
             print(e)
             return None
 
-        img_file = io.BytesIO(img_response.content)
-
-        try:
-            img = Image.open(img_file)
-            img_mobile = ImageHelper.make_img_mobile_friendly(img)
-            img_base64 = ImageHelper.img_to_base64(img_mobile)
-        except UnidentifiedImageError as e:
-            print(e)
-            return None
-
-        return img_base64
+        return io.BytesIO(img_response.content)
 
     @staticmethod
     def make_img_mobile_friendly(img):
@@ -69,5 +122,10 @@ class ImageHelper:
         Output: base64 string.
         """
         buffer = io.BytesIO()
-        img.save(buffer, format=img.format)
+        try:
+            img.save(buffer, format=img.format)
+        except ValueError as e:
+            print(e)
+            return None
+
         return base64.b64encode(buffer.getvalue()).decode('ascii')

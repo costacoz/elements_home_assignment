@@ -12,13 +12,15 @@ Mobile friendly resolution is considered to be maximum of 500px width and 500px 
 If the image is greater than that, then it is resized respecting the aspect ratio.
 
 ## How image caching is implemented
-In this project image caching is done by avoiding downloading of image multiple time.
+Image caching is done by avoiding downloading of image multiple time.
 
 There is an `processed_images` dict variable that contains image urls as a key and processed image (converted to base64 and optimized for mobile) as a value.
 
 ## Application structure
+Image and CSV files computations are carried out to `helper.py` helper classes for structuring and readability puproses.
 
 ## Performance
+
 
 ## Working in DTAP
 There are 4 branches in this repository:
@@ -35,8 +37,10 @@ The work was done in this sequence:
 * **accept** branch is merged to **main** branch
 
 ## Exception handling
+Exception handlings were used throughout the project extensively per task requirements.
 
 ## Response cache
+Response cache is implemented using `@cache_page` decorator for the view function.
 
 ## Scalability
 
