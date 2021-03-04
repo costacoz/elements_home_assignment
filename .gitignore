@@ -1,0 +1,5 @@
+.idea/
+venv/
+venv/Include
+/elements_assignment/__pycache__
+/csv_proc/__pycache__
