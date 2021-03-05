@@ -37,7 +37,7 @@ The work was done in this sequence:
 * **accept** branch is merged to **main** branch
 
 ## Exception handling
-Exception handlings were used throughout the project extensively per task requirements.
+Exception handlings were used throughout the project extensively per task requirements. Logger is used to keeping exception messages as per good practices.
 
 ## Response cache
 Response cache is implemented using `@cache_page` decorator for the view function.

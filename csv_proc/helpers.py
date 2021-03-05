@@ -83,11 +83,11 @@ class ImageHelper:
         Output: dict with image_url: base64
         """
         with Pool() as p:
-            images_b64 = p.map(ImageHelper.convert_image, image_urls)
+            images_b64 = p.map(ImageHelper.fetch_and_convert_image, image_urls)
         return dict(zip(image_urls, images_b64))
 
     @staticmethod
-    def convert_image(url):
+    def fetch_and_convert_image(url):
         """
         Retrieves an image, makes sure it is mobile friendly and returns base64 string of the image.
         If URL is not an image, returns None.

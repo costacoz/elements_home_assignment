@@ -21,7 +21,11 @@ def process_csv(request):
     except CSVException as e:
         return HttpResponse(e, status=500)
 
-    title_h_pos, desc_h_pos, img_h_pos = CSVHelper.get_header_fields_pos(csv_data[0], 'title', 'description', 'image')
+    if not len(csv_data):
+        return HttpResponse("CSV file is empty", status=500)
+
+    csv_header = csv_data[0]
+    title_h_pos, desc_h_pos, img_h_pos = CSVHelper.get_header_fields_pos(csv_header, 'title', 'description', 'image')
 
     result = list()
     images_to_convert = set()
